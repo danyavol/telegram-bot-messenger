@@ -1,7 +1,7 @@
 import { FirebaseOptions, initializeApp } from "firebase/app";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { collection, CollectionReference, doc, DocumentReference, Firestore, getDocs, getFirestore, setDoc } from 'firebase/firestore/lite';
-import { catchError, EMPTY, first, from, map, Observable, ReplaySubject, switchMap } from "rxjs";
+import { catchError, EMPTY, first, from, map, Observable, ReplaySubject, switchMap, throwError } from "rxjs";
 import { Message } from "telegraf/typings/core/types/typegram";
 
 enum Collections {
@@ -51,12 +51,12 @@ export class Database {
         return this.dbReady$.pipe( 
             switchMap(() => from(getDocs(messagesRef)).pipe(
                 first(),
-                catchError((err) => {
-                    console.error('Error during getting all messages!', err);
-                    return EMPTY;
-                }),
                 map((snap) => {
                     return snap.docs.map((doc) => doc.data());
+                }),
+                catchError((err) => {
+                    console.error('Error during getting all messages!', err);
+                    return throwError(() => err);
                 })
             ))
         );

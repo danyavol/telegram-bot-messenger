@@ -14,3 +14,5 @@ export const firebaseAuth = {
     login: process.env.FB_EMAIL,
     password: process.env.FB_PASS
 };
+
+export const serverPort = 3000;
