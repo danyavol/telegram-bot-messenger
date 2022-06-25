@@ -3,12 +3,12 @@ import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { collection, CollectionReference, doc, DocumentReference, Firestore, getDocs, getFirestore, setDoc } from 'firebase/firestore/lite';
 import { catchError, EMPTY, first, from, map, Observable, ReplaySubject, switchMap, throwError } from "rxjs";
 import { Message } from "telegraf/typings/core/types/typegram";
+import { firebaseAuth, firebaseConfig } from "./config";
 
 enum Collections {
     Messages = 'messages'
 }
-
-export class Database {
+class Database {
     private db: Firestore;
     private dbReady$ = new ReplaySubject<void>();
 
@@ -62,3 +62,5 @@ export class Database {
         );
     }
 }
+
+export const db = new Database(firebaseConfig, firebaseAuth);

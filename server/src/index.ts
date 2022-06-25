@@ -1,16 +1,13 @@
-import bodyParser from 'body-parser';
+import { adminOnly, createAdminToken } from '@services/auth';
+import { Crypto } from '@services/crypto';
 import express from 'express';
-import { map } from 'rxjs';
-import { Telegraf } from 'telegraf';
-import { firebaseAuth, firebaseConfig, serverPort, telegramBotToken } from './config';
-import { Database } from './database';
-import { Chat } from './interfaces';
+import { bot, serverPort, SUPERADMIN_PASS } from './config';
+import { db } from './database';
+import routes from './routes';
+import cookieParser from 'cookie-parser';
 
-const db = new Database(firebaseConfig, firebaseAuth);
 
 /***************** TELEGRAM BOT *****************/
-
-const bot = new Telegraf(telegramBotToken);
 
 bot.on('message', (ctx, next) => {
     const { first_name, last_name, username } = ctx.update.message.from;
@@ -26,72 +23,22 @@ bot.launch();
 
 const server = express();
 
-server.use(bodyParser.text());
-server.use(bodyParser.json());
+server.use(express.text());
+server.use(express.json());
+server.use(cookieParser());
 
-server.get('/chats', (req, res) => {
-    db.getAllMessages().pipe(
-        map((messages) => {
-            const chats: Chat[] = [];
-            
-            messages.forEach(msg => {
-                const chat = chats.find(chat => chat.chatId === msg.chat.id);
 
-                if (chat) {
-                    if (chat.lastMessage.date < msg.date) {
-                        chat.lastMessage = msg;
-                    }
-                } else {
-                    chats.push({
-                        chatId: msg.chat.id,
-                        lastMessage: msg
-                    });
-                }
-            });
+server.use('/api', adminOnly, routes);
 
-            chats.sort((a, b) => b.lastMessage.date - a.lastMessage.date);
-
-            return chats;
-        })
-    ).subscribe({
-        next: (chats) => {
-            res.status(200).json(chats);
-        },
-        error: (err) => {
-            res.status(500).send(err);
-        }
-    });
-});
-
-server.get('/chats/:chatId/messages', (req, res) => {
-    const chatId = Number(req.params.chatId) || 0;
-
-    db.getAllMessages().pipe(
-        map((messages) => {
-            const chatMessages = messages.filter(msg => msg.chat.id === chatId);
-            chatMessages.sort((a, b) => b.date = a.date);
-            return chatMessages;
-        })
-    ).subscribe({
-        next: (messages) => {
-            res.status(200).json(messages);
-        },
-        error: (err) => {
-            res.status(500).send(err);
-        }
-    });
-});
-
-server.post('/message/:chatId', (req, res) => {
-    const chatId = Number(req.params.chatId) || 0;
-    const message: string = req.body;
-
-    bot.telegram.sendMessage(chatId, message).then(() => {
+// Authorization
+server.post('/auth', async (req, res) => {
+    const { password } = req.body;
+    if (Crypto.compare(password || '', SUPERADMIN_PASS || '')) {
+        createAdminToken(res);
         res.sendStatus(204);
-    }).catch((err) => {
-        console.error('Error sending message!', err);
-        res.status(500).send(err);
-    });    
+    } else {
+        res.sendStatus(401);
+    }
 });
 
 console.log('Server listening at the port', serverPort);
