@@ -1,32 +1,29 @@
-import { adminOnly, createAdminToken } from '@services/auth';
+import { admindOnlySocket, adminOnly, createAdminToken } from '@services/auth';
 import { Crypto } from '@services/crypto';
 import express from 'express';
 import { bot, serverPort, SUPERADMIN_PASS } from './config';
 import { db } from './database';
 import routes from './routes';
 import cookieParser from 'cookie-parser';
+import { Server, Socket } from 'socket.io';
+import http from 'http';
 
 
-/***************** TELEGRAM BOT *****************/
 
-bot.on('message', (ctx, next) => {
-    const { first_name, last_name, username } = ctx.update.message.from;
-    console.log(`NEW MESSAGE from ${username} | ${first_name} ${last_name}`);
-    db.saveMessage(ctx.update.message).subscribe();
-    next();
-});
-
-bot.launch();
 
 
 /***************** HTTP SERVER *****************/
 
 const server = express();
+const httpServer = http.createServer(server);
+const io = new Server(httpServer, {
+    cors: { origin: "*" },
+    
+});
 
 server.use(express.text());
 server.use(express.json());
 server.use(cookieParser());
-
 
 server.use('/api', adminOnly, routes);
 
@@ -41,8 +38,26 @@ server.post('/auth', async (req, res) => {
     }
 });
 
+/***************** SOCKET SERVER *****************/
+
+io.use(admindOnlySocket);
+
+/***************** SERVER START *****************/
+
 console.log('Server listening at the port', serverPort);
-server.listen(serverPort);
+httpServer.listen(serverPort);
+
+/***************** TELEGRAM BOT *****************/
+
+bot.on('message', (ctx, next) => {
+    const { first_name, last_name, username } = ctx.update.message.from;
+    console.log(`NEW MESSAGE from ${username} | ${first_name} ${last_name}`);
+    db.saveMessage(ctx.update.message).subscribe();
+    io.emit('new message', ctx.update.message);
+    next();
+});
+
+bot.launch();
 
 
 

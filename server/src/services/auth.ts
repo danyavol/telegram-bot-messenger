@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
+import { Socket } from 'socket.io';
 import { PRIVATE_KEY } from '../config';
 
 export type Token = string;
@@ -34,6 +35,18 @@ export function adminOnly(req: Request, res: Response, next: NextFunction): void
         // Invalid token
         res.sendStatus(401);
     } 
+}
+
+export function admindOnlySocket(socket: Socket, next: Function) {
+    const tokenPayload = decodeJWT(socket.handshake.auth.token);
+
+    if (tokenPayload?.sub === adminLabel) {
+        // Valid admin token
+        next();
+    } else {
+        // Invalid token
+        socket.conn.close();
+    }
 }
 
 export function createAdminToken(res: Response): void {
