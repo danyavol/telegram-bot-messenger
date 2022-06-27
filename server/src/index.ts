@@ -7,6 +7,7 @@ import routes from './routes';
 import cookieParser from 'cookie-parser';
 import { Server, Socket } from 'socket.io';
 import http from 'http';
+import cors from 'cors';
 
 
 
@@ -16,11 +17,8 @@ import http from 'http';
 
 const server = express();
 const httpServer = http.createServer(server);
-const io = new Server(httpServer, {
-    cors: { origin: "*" },
-    
-});
 
+server.use( cors({ origin: ['http://localhost:4200'], credentials: true }) );
 server.use(express.text());
 server.use(express.json());
 server.use(cookieParser());
@@ -28,17 +26,26 @@ server.use(cookieParser());
 server.use('/api', adminOnly, routes);
 
 // Authorization
-server.post('/auth', async (req, res) => {
+server.post('/auth', (req, res) => {
     const { password } = req.body;
     if (Crypto.compare(password || '', SUPERADMIN_PASS || '')) {
-        createAdminToken(res);
-        res.sendStatus(204);
+        const token = createAdminToken();
+        res.status(200).send(token);
     } else {
         res.sendStatus(401);
     }
 });
 
+server.get('/test', adminOnly, (req, res) => {
+    res.sendStatus(204);
+});
+
 /***************** SOCKET SERVER *****************/
+
+const io = new Server(httpServer, {
+    cors: { origin: "*" },
+    
+});
 
 io.use(admindOnlySocket);
 

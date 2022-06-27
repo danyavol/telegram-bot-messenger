@@ -25,11 +25,10 @@ function decodeJWT(token: Token): jwt.JwtPayload {
 
 
 export function adminOnly(req: Request, res: Response, next: NextFunction): void {
-    const tokenPayload = decodeJWT(req.cookies[tokenField]);
+    const tokenPayload = decodeJWT(req.headers[tokenField] as string);
     
     if (tokenPayload?.sub === adminLabel) {
         // Valid admin token
-        createAdminToken(res);
         next();
     } else {
         // Invalid token
@@ -45,18 +44,13 @@ export function admindOnlySocket(socket: Socket, next: Function) {
         next();
     } else {
         // Invalid token
-        socket.conn.close();
+        next(new Error("invalid session"));
+        
+        // socket.conn.close();
     }
 }
 
-export function createAdminToken(res: Response): void {
+export function createAdminToken(): string {
     const expirationTime = expTime();
-    const token = createJWT({ sub: adminLabel }, { expiresIn: expirationTime / 1000 });
-
-    res.cookie(tokenField, token, {
-        expires: new Date(Date.now() + expirationTime),
-        httpOnly: true,
-        secure: true,
-        sameSite: 'none'
-    });
+    return createJWT({ sub: adminLabel }, { expiresIn: expirationTime / 1000 });
 }
