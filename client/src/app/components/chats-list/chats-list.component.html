@@ -1,0 +1,14 @@
+<mat-card>
+    <mat-card-title>Chats List</mat-card-title>
+
+    <mat-card-content>
+        <mat-card *ngFor="let chat of chats" (click)="onChatClick(chat.chatId)">
+            {{chat.lastMessage.date * 1000 | date: 'medium'}} {{chat.lastMessage.from?.first_name}}
+            <ng-container *ngIf="isTextMessage(chat.lastMessage); else unsupportedMessageType">{{chat.lastMessage.text}}</ng-container>
+
+            <ng-template #unsupportedMessageType>
+                <div>Unsupported message</div>
+            </ng-template>
+        </mat-card>
+    </mat-card-content>
+</mat-card>

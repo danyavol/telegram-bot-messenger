@@ -44,11 +44,12 @@ export class ApiService {
     }
 
     public getChatMessages(chatId: number): Observable<Message[]> {
-        const path = `${environment.apiUrl}/chats/${chatId}/messages`;
+        const path = `${environment.apiUrl}/api/chats/${chatId}/messages`;
         return this.http.get<Message[]>(path);
     }
 
     public getMessagesUpdates(): Observable<Message> {
+        console.log(123);
         const subject = new Subject<Message>();
 
         this.socket.on('new message', (newMsg: Message) => {

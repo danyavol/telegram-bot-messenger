@@ -1,0 +1,11 @@
+<ul>
+    <li *ngFor="let message of messages">
+        <ng-container *ngIf="isTextMessage(message); else unsupportedMessageType">
+            {{message.text}}
+        </ng-container>
+        
+        <ng-template #unsupportedMessageType>
+            <div>Unsupported message</div>
+        </ng-template>
+    </li>
+</ul>

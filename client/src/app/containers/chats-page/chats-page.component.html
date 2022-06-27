@@ -1,1 +1,11 @@
-<p>chats-page works!</p>
+<app-chats-list 
+    *ngIf="chats$ | async as chats" 
+    [chats]="chats" 
+    (chatClick)="onChatClick($event)"
+></app-chats-list>
+
+<app-messages-list 
+    *ngIf="messages$ | async as messages" 
+    [messages]="messages"
+></app-messages-list>
+
