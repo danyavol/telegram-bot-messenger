@@ -1,7 +1,15 @@
-import { Component, OnInit } from '@angular/core';
-import { BehaviorSubject, combineLatest, map, mergeWith, Observable, startWith, switchMap, tap } from 'rxjs';
+import { Component } from '@angular/core';
+import { BehaviorSubject, map, merge, Observable, ReplaySubject, scan, switchMap, tap } from 'rxjs';
 import { Chat } from 'src/app/interfaces/chat.interface';
 import { ApiService } from 'src/app/services/api.service';
+import { SpinnerService } from 'src/app/services/spinner.service';
+import { Message } from 'telegraf/typings/core/types/typegram';
+
+enum EmitType {
+    NewMessage,
+    ChatMessages,
+    ChatsList
+}
 
 @Component({
     selector: 'app-chats-page',
@@ -10,46 +18,51 @@ import { ApiService } from 'src/app/services/api.service';
 })
 export class ChatsPageComponent {
 
-    currentChatId$ = new BehaviorSubject<number>(0);
+    currentChatId$ = new ReplaySubject<number>();
     newMessage$ = this.apiService.getMessagesUpdates();
 
-    chats$: Observable<Chat[]> = combineLatest([
-        this.apiService.getChats(), 
-        this.newMessage$.pipe(startWith(null))  // TODO: Doesn't work with multiple new messages
-    ]).pipe(
-        map(([chats, newMessage]) => {
-            if (!newMessage) return chats;
+    chats$: Observable<Chat[]> = merge(
+        this.apiService.getChats().pipe(map(value => ({ type: EmitType.ChatsList, value }))), 
+        this.newMessage$.pipe(map(value => ({ type: EmitType.NewMessage, value })))
+    ).pipe(
+        scan((allChats, emit) => {
+            if (emit.type === EmitType.ChatsList) return emit.value as Chat[];
 
-            const existingChat = chats.find(chat => chat.chatId === newMessage.chat.id);
-            if (existingChat) {
-                existingChat.lastMessage = newMessage;
-                return chats;
+            const newMessage = emit.value as Message;
+            const chatIndex = allChats.findIndex(chat => chat.chatId === newMessage.chat.id);
+            if (chatIndex < 0) {
+                return [{ chatId: newMessage.chat.id, lastMessage: newMessage }, ...allChats];
             } else {
-                return [{ chatId: newMessage.chat.id, lastMessage: newMessage }, ...chats];
+                const chat = allChats.splice(chatIndex, 1)[0];
+                chat.lastMessage = newMessage;
+                return [chat, ...allChats];
             }
-        })
+        }, [] as Chat[])
     );
 
     messages$ = this.currentChatId$.pipe(
+        tap(() => this.spinnerService.isActive.next(true)),
         switchMap((chatId) => 
-            combineLatest([
-                this.apiService.getChatMessages(chatId),
-                this.newMessage$.pipe(startWith(null)) // TODO: Doesn't work with multiple new messages
-            ]).pipe(
-                map(([messages, newMessage]) => {
-                    if (messages.length && messages[0].chat.id === newMessage?.chat.id) {
-                        return [...messages, newMessage];
+            merge(
+                this.apiService.getChatMessages(chatId).pipe(map(value => ({ type: EmitType.ChatMessages, value }))),
+                this.newMessage$.pipe(map(value => ({ type: EmitType.NewMessage, value })))
+            ).pipe(
+                scan((allMessages, emit) => {
+                    if (emit.type === EmitType.ChatMessages) return emit.value as Message[];
+
+                    const newMessage = emit.value as Message;
+                    if (allMessages[0]?.chat.id === newMessage.chat.id) {
+                        return [newMessage, ...allMessages]
                     } else {
-                        return messages;
+                        return allMessages;
                     }
-                }),
-                tap(console.log)
+                }, [] as Message[]),
+                tap(() => this.spinnerService.isActive.next(false)),
             )
         )
     );
     
-
-    constructor(private apiService: ApiService) {
+    constructor(private apiService: ApiService, private spinnerService: SpinnerService) {
         this.apiService.connectToSocket();
     }
 

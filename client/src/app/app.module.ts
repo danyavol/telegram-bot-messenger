@@ -5,15 +5,16 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { ChatsListComponent } from './components/chats-list/chats-list.component';
+import { MessagesListComponent } from './components/messages-list/messages-list.component';
 import { AuthPageComponent } from './containers/auth-page/auth-page.component';
 import { ChatsPageComponent } from './containers/chats-page/chats-page.component';
 import { AuthInterceptor } from './interceptors/auth.interceptor';
-import { MessagesListComponent } from './components/messages-list/messages-list.component';
 
 
 @NgModule({
@@ -33,7 +34,8 @@ import { MessagesListComponent } from './components/messages-list/messages-list.
         MatInputModule,
         MatButtonModule,
         FormsModule,
-        MatCardModule
+        MatCardModule,
+        MatProgressBarModule
     ],
     providers: [
         {

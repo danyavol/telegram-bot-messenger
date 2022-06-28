@@ -49,7 +49,6 @@ export class ApiService {
     }
 
     public getMessagesUpdates(): Observable<Message> {
-        console.log(123);
         const subject = new Subject<Message>();
 
         this.socket.on('new message', (newMsg: Message) => {

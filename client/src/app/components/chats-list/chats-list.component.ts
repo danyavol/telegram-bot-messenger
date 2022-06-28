@@ -9,7 +9,7 @@ import { MessageTypeChecker } from 'src/app/utils/message-type-checker';
 })
 export class ChatsListComponent {
     @Input() chats: Chat[] = [];
-    @Input() activeChatId?: number;
+    @Input() activeChatId: number | null = null;
     @Output() chatClick = new EventEmitter<number>();
 
     isTextMessage = MessageTypeChecker.isText;

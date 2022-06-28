@@ -1,14 +1,20 @@
-<mat-card>
-    <mat-card-title>Chats List</mat-card-title>
 
-    <mat-card-content>
-        <mat-card *ngFor="let chat of chats" (click)="onChatClick(chat.chatId)">
-            {{chat.lastMessage.date * 1000 | date: 'medium'}} {{chat.lastMessage.from?.first_name}}
+<div class="chats-wrapper">
+    <mat-card *ngFor="let chat of chats" (click)="onChatClick(chat.chatId)" class="chat" [class.active]="activeChatId === chat.chatId">
+        <div class="info-row">
+            <div class="username ellipsis">
+                {{chat.lastMessage.from?.first_name}} {{chat.lastMessage.from?.last_name}}
+            </div>
+            <div class="date">
+                {{chat.lastMessage.date * 1000 | date: 'medium'}}
+            </div>
+        </div>
+        <div class="message-row ellipsis">
             <ng-container *ngIf="isTextMessage(chat.lastMessage); else unsupportedMessageType">{{chat.lastMessage.text}}</ng-container>
 
             <ng-template #unsupportedMessageType>
-                <div>Unsupported message</div>
+                <span class="unsupported-msg"></span>
             </ng-template>
-        </mat-card>
-    </mat-card-content>
-</mat-card>
+        </div>
+    </mat-card>
+</div>

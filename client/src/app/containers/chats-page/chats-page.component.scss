@@ -1,0 +1,23 @@
+.container {
+    display: flex;
+    padding: 20px;
+    gap: 20px;
+    justify-content: center;
+    height: 100%;
+    box-sizing: border-box;
+
+    .chats-list {
+        flex: 1 1 0px;
+        min-width: 250px;
+    }
+
+    .separator {
+        background-color: rgba(0,0,0,.26);
+        width: 2px;
+        min-width: 2px;
+    }
+
+    .messages-list {
+        flex: 2 1 0px;
+    }
+}

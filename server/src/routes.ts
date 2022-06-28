@@ -49,7 +49,7 @@ routes.get('/chats/:chatId/messages', (req, res) => {
     db.getAllMessages().pipe(
         map((messages) => {
             const chatMessages = messages.filter(msg => msg.chat.id === chatId);
-            chatMessages.sort((a, b) => b.date = a.date);
+            chatMessages.sort((a, b) => b.date - a.date);
             return chatMessages;
         })
     ).subscribe({
