@@ -5,12 +5,10 @@ import { bot, serverPort, SUPERADMIN_PASS } from './config';
 import { db } from './database';
 import routes from './routes';
 import cookieParser from 'cookie-parser';
-import { Server, Socket } from 'socket.io';
+import { Server } from 'socket.io';
 import http from 'http';
 import cors from 'cors';
-
-
-
+import { Message } from 'telegraf/typings/core/types/typegram';
 
 
 /***************** HTTP SERVER *****************/
@@ -58,7 +56,11 @@ httpServer.listen(serverPort);
 
 bot.on('message', (ctx, next) => {
     const { first_name, last_name, username } = ctx.update.message.from;
-    console.log(`NEW MESSAGE from ${username} | ${first_name} ${last_name}`);
+    let msg: string | undefined = (ctx.update.message as Message.TextMessage).text;
+    if (msg) msg = msg.replace(/[\n\r\s\t]+/g, ' ');
+    if (msg?.length > 50) msg = msg.slice(0, 47) + '...'; 
+    console.log(`[${getBeautifulDate(ctx.update.message.date)}] NEW MESSAGE from ${first_name}${last_name ? ` ${last_name}` : ''}${username ? ` #${username}` : ''} : ${msg || 'Unsupported message'}`);
+
     db.saveMessage(ctx.update.message).subscribe();
     io.emit('new message', ctx.update.message);
     next();
@@ -66,6 +68,11 @@ bot.on('message', (ctx, next) => {
 
 bot.launch();
 
+
+function getBeautifulDate(seconds: number): string {
+    const date = new Date(seconds * 1000);
+    return date.toLocaleString();
+}
 
 
 // Enable graceful stop
