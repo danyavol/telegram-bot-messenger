@@ -48,24 +48,17 @@ mat-card.mat-card {
         background-color: rgba(0, 0, 0, 0.26);
         border-radius: 100px;
     }
+}
 
-    // ::-webkit-scrollbar-button {
-    //     background: green;
-    // }
 
-    // ::-webkit-scrollbar-corner {
-    //     background: orange;
-    // }
+@media (max-width: 720px) {
+    .desktop-only {
+        display: none !important;
+    }
+}
 
-    // ::-webkit-scrollbar-thumb {
-    //     background: red;
-    // }
-
-    // ::-webkit-scrollbar-track {
-    //     background: yellowgreen;
-    // }
-
-    // ::-webkit-scrollbar-track-piece {
-    //     background: brown;
-    // }
+@media (min-width: 721px) {
+    .mobile-only {
+        display: none !important;
+    }    
 }

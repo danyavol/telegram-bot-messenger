@@ -1,3 +1,14 @@
+.wrapper {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.header {
+    display: none;
+    flex-shrink: 0;
+}
+
 .container {
     display: flex;
     padding: 20px;
@@ -6,9 +17,24 @@
     height: 100%;
     box-sizing: border-box;
 
+    @media (max-width: 720px) {
+        padding: 10px;
+        height: calc(100% - 64px);
+    }
+
+    @media (max-width: 599px) {
+        height: calc(100% - 56px);
+    }
+
     .chats-list {
         flex: 1 1 0px;
         min-width: 250px;
+        display: flex;
+        flex-direction: column;
+
+        .comp-wrapper {
+            flex-grow: 1;
+        }
     }
 
     .separator {
@@ -19,5 +45,19 @@
 
     .messages-list {
         flex: 2 1 0px;
+    }
+}
+
+@media (max-width: 720px) {
+    .header {
+        display: flex;
+    }
+
+    .separator {
+        display: none;
+    }
+
+    .hidden {
+        display: none !important;
     }
 }

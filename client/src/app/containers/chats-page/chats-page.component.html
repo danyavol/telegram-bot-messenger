@@ -1,22 +1,36 @@
-<main class="container">
-    <div class="chats-list">
-        <app-chats-list
-            *ngIf="chats$ | async as chats" 
-            [chats]="chats"
-            [activeChatId]="currentChatId$ | async"
-            (chatClick)="onChatClick($event)"
-        ></app-chats-list>
-    </div>
+<div class="wrapper">
+    <mat-toolbar class="header" color="primary">
+        <button mat-icon-button (click)="isChatOpen = false" *ngIf="isChatOpen">
+            <mat-icon>arrow_back</mat-icon>
+        </button>
+        <span *ngIf="!isChatOpen">Чаты</span>
+    </mat-toolbar>
+    
+    <main class="container">
+        <div class="chats-list" [class.hidden]="isChatOpen">
+            <div class="comp-wrapper">
+                <app-chats-list
+                    *ngIf="chats$ | async as chats" 
+                    [chats]="chats"
+                    [activeChatId]="currentChatId$ | async"
+                    (chatClick)="onChatClick($event)"
+                ></app-chats-list>
+            </div>
 
-    <div class="separator"></div>
+            <button mat-raised-button (click)="logout()">Выйти</button>
+        </div>
+    
+        <div class="separator"></div>
+    
+        <div class="messages-list" [class.hidden]="!isChatOpen">
+            <app-messages-list
+                *ngIf="messages$ | async as messages"
+                [chatId]="currentChatId$ | async"
+                [messages]="messages"
+            ></app-messages-list>
+        </div>
+    </main>
+</div>
 
-    <div class="messages-list">
-        <app-messages-list
-            *ngIf="messages$ | async as messages"
-            [chatId]="currentChatId$ | async"
-            [messages]="messages"
-        ></app-messages-list>
-    </div>
-</main>
 
 

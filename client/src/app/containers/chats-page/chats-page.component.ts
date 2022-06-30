@@ -25,6 +25,8 @@ export class ChatsPageComponent {
     );
     newMessage$ = this.apiService.getMessagesUpdates();
 
+    isChatOpen = false;
+
     chats$: Observable<Chat[]> = merge(
         this.apiService.getChats().pipe(map(value => ({ type: EmitType.ChatsList, value }))), 
         this.newMessage$.pipe(map(value => ({ type: EmitType.NewMessage, value })))
@@ -70,15 +72,23 @@ export class ChatsPageComponent {
         private apiService: ApiService, 
         private spinnerService: SpinnerService,
         private route: ActivatedRoute,
-        private router: Router
+        private router: Router,
     ) {
         setTimeout(() => {
             const chatId = Number(this.route.snapshot.queryParamMap.get('id'));
-            if (chatId) this.currentChatIdSbj.next(chatId);
+            if (chatId) {
+                this.currentChatIdSbj.next(chatId);
+                this.isChatOpen = true;
+            }
         });
     }
 
     onChatClick(chatId: number): void {
         this.currentChatIdSbj.next(chatId);
+        this.isChatOpen = true;
+    }
+
+    logout(): void {
+        this.apiService.logOut();
     }
 }

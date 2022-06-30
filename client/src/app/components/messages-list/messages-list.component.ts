@@ -44,12 +44,10 @@ export class MessagesListComponent {
     }
 
     isDifferentDays(msg1: Message, msg2?: Message): boolean {
-        
         if (!msg2) return true;
         
         const date1 = new Date(msg1.date*1000);
         const date2 = new Date(msg2.date*1000);
-        console.log(date1, date2);
         return date1.getDate() !== date2.getDate() || Math.abs(msg1.date - msg2.date) > 60*60*24;
     }
 
