@@ -10,24 +10,43 @@
         gap: 7px;
 
         &.active {
-            background-color: rgba(103,58,183,.15);
+            background-color: #ece8f4;
         }
 
         .info-row {
             display: flex;
             justify-content: space-between;
 
-            .username {
+            .chat-name {
                 font-weight: 500;
                 font-size: 15px;
+
+                .last-name {
+                    margin-left: 3px;
+                }
+
+                .hash {
+                    color: #8e21bb;
+                    font-weight: 500;
+                    margin-left: 5px;
+                    display: inline-block;
+                }
             }
 
             .date {
                 white-space: nowrap;
+                font-size: 13px;
+                color: #545454;
+                font-weight: 500;
             }
         }
 
         .message-row {
+            .my-message-marker {
+                font-weight: 400;
+                margin-right: 5px;
+                color: #8e21bb;
+            }
         }
     }
 }

@@ -2,14 +2,21 @@
 <div class="chats-wrapper">
     <mat-card *ngFor="let chat of chats" (click)="onChatClick(chat.chatId)" class="chat" [class.active]="activeChatId === chat.chatId">
         <div class="info-row">
-            <div class="username ellipsis">
-                {{chat.lastMessage.from?.first_name}} {{chat.lastMessage.from?.last_name}}
+            <div class="chat-name ellipsis">
+                <ng-container *ngIf="isPrivateChat(chat.lastMessage.chat)">
+                    <span class="first-name">{{chat.lastMessage.chat.first_name}}</span>
+                    <span *ngIf="chat.lastMessage.chat.last_name" class="last-name">{{chat.lastMessage.chat.last_name}}</span>
+                    <ng-container *ngIf="chat.lastMessage.chat.username">
+                        <span class="hash">#</span><span class="username">{{chat.lastMessage.chat.username}}</span>
+                    </ng-container>
+                </ng-container>
             </div>
             <div class="date">
-                {{chat.lastMessage.date * 1000 | date: 'medium'}}
+                {{chat.lastMessage.date * 1000 | msgDate: 'short'}}
             </div>
         </div>
         <div class="message-row ellipsis">
+            <ng-container *ngIf="isMyMessage(chat.lastMessage)"><span class="my-message-marker">Вы:</span></ng-container>
             <ng-container *ngIf="isTextMessage(chat.lastMessage); else unsupportedMessageType">{{chat.lastMessage.text}}</ng-container>
 
             <ng-template #unsupportedMessageType>

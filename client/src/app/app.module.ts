@@ -1,5 +1,5 @@
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
-import { NgModule } from '@angular/core';
+import { LOCALE_ID, NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -15,7 +15,11 @@ import { MessagesListComponent } from './components/messages-list/messages-list.
 import { AuthPageComponent } from './containers/auth-page/auth-page.component';
 import { ChatsPageComponent } from './containers/chats-page/chats-page.component';
 import { AuthInterceptor } from './interceptors/auth.interceptor';
+import { MessageDatePipe } from './pipes/date.pipe';
 
+import { registerLocaleData } from '@angular/common';
+import localeRu from '@angular/common/locales/ru-BY';
+registerLocaleData(localeRu);
 
 @NgModule({
     declarations: [
@@ -23,7 +27,8 @@ import { AuthInterceptor } from './interceptors/auth.interceptor';
         AuthPageComponent,
         ChatsPageComponent,
         ChatsListComponent,
-        MessagesListComponent
+        MessagesListComponent,
+        MessageDatePipe
     ],
     imports: [
         BrowserModule,
@@ -43,6 +48,7 @@ import { AuthInterceptor } from './interceptors/auth.interceptor';
             useClass: AuthInterceptor,
             multi: true,
         },
+        { provide: LOCALE_ID, useValue: 'ru-BY' },
     ],
     bootstrap: [AppComponent]
 })

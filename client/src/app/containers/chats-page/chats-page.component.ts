@@ -72,8 +72,6 @@ export class ChatsPageComponent {
         private route: ActivatedRoute,
         private router: Router
     ) {
-        this.apiService.connectToSocket();
-
         setTimeout(() => {
             const chatId = Number(this.route.snapshot.queryParamMap.get('id'));
             if (chatId) this.currentChatIdSbj.next(chatId);

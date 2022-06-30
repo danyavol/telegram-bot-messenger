@@ -1,21 +1,29 @@
 <div class="container">
     <div class="messages-list scroll">
-        <ng-container *ngFor="let message of messages">
-            <div class="message not-my-message" *ngIf="isTextMessage(message); else unsupportedMessageType">
-                {{message.text}}
+        <ng-container *ngFor="let message of messages; let i = index">
+            <div class="message" [ngClass]="isMyMessage(message) ? 'my-message' : 'not-my-message'">
+                <ng-container  *ngIf="isTextMessage(message); else unsupportedMessageType">
+                    {{message.text}}
+                </ng-container>
+                
+                <ng-template #unsupportedMessageType>
+                    <span class="unsupported-msg"></span>
+                </ng-template>
+    
+                <span class="date">{{message.date * 1000 | date: 'HH:mm'}}</span>
             </div>
-            
-            <ng-template #unsupportedMessageType>
-                <span class="message unsupported-msg not-my-message"></span>
-            </ng-template>
+
+            <div class="day-info" *ngIf="isDifferentDays(message, messages[i+1])">
+                {{message.date * 1000 | date: 'd MMMM'}}
+            </div>
         </ng-container>
     </div>
     <mat-card class="send-message-form">
         <mat-form-field appearance="outline" class="message-input">
             <mat-label>Сообщение пользователю</mat-label>
-            <input matInput type="password" [(ngModel)]="messageModel" (keydown.enter)="sendMessage()">
+            <input matInput [(ngModel)]="messageModel" (keydown.enter)="sendMessage()" [disabled]="(isLoading$ | async) || false">
         </mat-form-field>
         
-        <button mat-raised-button color="primary" (click)="sendMessage()">Отправить</button>
+        <button mat-raised-button color="primary" (click)="sendMessage()" [disabled]="(isLoading$ | async) || false">Отправить</button>
     </mat-card>
 </div>

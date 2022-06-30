@@ -12,7 +12,8 @@
 
     <div class="messages-list">
         <app-messages-list
-            *ngIf="messages$ | async as messages" 
+            *ngIf="messages$ | async as messages"
+            [chatId]="currentChatId$ | async"
             [messages]="messages"
         ></app-messages-list>
     </div>

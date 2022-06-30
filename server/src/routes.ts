@@ -67,8 +67,9 @@ routes.post('/message/:chatId', (req, res) => {
     const chatId = Number(req.params.chatId) || 0;
     const message: string = req.body;
 
-    bot.telegram.sendMessage(chatId, message).then(() => {
-        res.sendStatus(204);
+    bot.telegram.sendMessage(chatId, message).then((sentMessage) => {
+        db.saveMessage(sentMessage).subscribe();
+        res.status(200).json(sentMessage);
     }).catch((err) => {
         console.error('Error sending message!', err);
         res.status(500).send(err);

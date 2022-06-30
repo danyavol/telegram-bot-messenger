@@ -9,8 +9,8 @@ const WEEK = DAY * 7;
 })
 export class MessageDatePipe extends DatePipe implements PipeTransform {
 
-    override transform(value: Date | string | number | null | undefined, type: "short" | "full"): string | null {
-        if (!value) return null;
+    override transform(value: Date | string | number | null | undefined, type: 'short' | 'long' = 'short'): any {
+        if (value == null) return null;
 
         const now = new Date();
         const date = new Date(value);
@@ -20,18 +20,19 @@ export class MessageDatePipe extends DatePipe implements PipeTransform {
         if (type === 'short') {
             if (now.getTime() - date.getTime() < 1000*60*60*24 && date.getDate() === now.getDate()) {
                 // Only time
+                format = 'HH:mm';
                 
             } else if (now.getTime() - date.getTime() < WEEK) {
                 // Only day of week
+                format = 'ccc';
 
             } else {
                 // Full short date
-
+                format = 'dd:MM:yyyy';
             }
-            return super.transform(value, '');
         }
         else {
-
+            format = 'dd:MM:yyyy, HH:mm';
         }
 
         return super.transform(value, format);

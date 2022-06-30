@@ -14,19 +14,22 @@ const tokenField = 'token';
 })
 export class ApiService {
 
-    private socket = io(environment.socketUrl, {
-        autoConnect: false,
-        auth: (cb) => {
-            cb({ token: localStorage.getItem(tokenField) });
-        }
-    });
-
+    public newMessageSbj = new Subject<Message>();
     private isUserAuthorized: boolean = false;
 
-    constructor(private http: HttpClient, private router: Router) { }
+    constructor(private http: HttpClient, private router: Router) {
+        const socket = io(environment.socketUrl, {
+            autoConnect: false,
+            auth: (cb) => {
+                cb({ token: localStorage.getItem(tokenField) });
+            }
+        });
 
-    public connectToSocket(): void {
-        this.socket.connect();
+        socket.on('new message', (newMsg: Message) => {
+            this.newMessageSbj.next(newMsg);
+        });
+
+        socket.connect();
     }
 
     public getToken(password: string): Observable<string> {
@@ -36,6 +39,11 @@ export class ApiService {
                 localStorage.setItem(tokenField, token);
             })
         );
+    }
+
+    public sendMessage(chatId: number, message: string): Observable<Message> {
+        const path = `${environment.apiUrl}/api/message/${chatId}`;
+        return this.http.post<Message>(path, message);
     }
 
     public getChats(): Observable<Chat[]> {
@@ -49,13 +57,7 @@ export class ApiService {
     }
 
     public getMessagesUpdates(): Observable<Message> {
-        const subject = new Subject<Message>();
-
-        this.socket.on('new message', (newMsg: Message) => {
-            subject.next(newMsg);
-        });
-
-        return subject.asObservable();
+        return this.newMessageSbj.asObservable();
     }
 
     /**************** Authorization ****************/
