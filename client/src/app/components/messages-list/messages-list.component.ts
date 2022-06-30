@@ -10,8 +10,14 @@ import { Message } from 'telegraf/typings/core/types/typegram';
 export class MessagesListComponent {
     @Input() messages: Message[] = [];
 
+    public messageModel: string = '';
+
     isTextMessage = MessageTypeChecker.isText;
 
     constructor() { }
+
+    sendMessage(): void {
+        
+    }
 
 }

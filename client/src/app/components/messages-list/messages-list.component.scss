@@ -5,7 +5,43 @@
     height: 100%;
 
     .messages-list {
+        display: flex;
+        flex-direction: column-reverse;
         flex-grow: 1;
         overflow-y: scroll;
+
+        .message {
+            border-radius: 8px;
+            max-width: 80%;
+            padding: 8px;
+
+            + .message {
+                margin-bottom: 7px;
+            }
+
+            &.my-message {
+                align-self: flex-end;
+                background-color: #bfaaeb;
+            }
+
+            &.not-my-message {
+                align-self: flex-start;
+                background-color: #ece8f4;
+            }
+        }
+    }
+
+    .send-message-form {
+        display: flex;
+        gap: 10px;
+
+        .message-input {
+            flex-grow: 1;
+
+            ::ng-deep.mat-form-field-wrapper {
+                margin: 0;
+                padding: 0;
+            }
+        }
     }
 }

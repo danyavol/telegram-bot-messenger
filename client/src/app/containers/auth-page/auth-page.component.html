@@ -1,6 +1,11 @@
-<mat-form-field appearance="outline">
-    <mat-label>Password</mat-label>
-    <input matInput placeholder="Placeholder" [(ngModel)]="password">
-</mat-form-field>
+<div class="container">
+    <mat-card class="auth-card">
+        <mat-form-field appearance="outline">
+            <mat-label>Пароль</mat-label>
+            <input matInput type="password" [(ngModel)]="password" (keydown.enter)="submit()">
+        </mat-form-field>
+        
+        <button mat-raised-button color="primary" (click)="submit()">Войти</button>
+    </mat-card>
+</div>
 
-<button mat-raised-button color="primary" (click)="submit()">Log in</button>

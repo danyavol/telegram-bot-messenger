@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
-import { BehaviorSubject, map, merge, Observable, ReplaySubject, scan, switchMap, tap } from 'rxjs';
+import { ActivatedRoute, Router } from '@angular/router';
+import { map, merge, Observable, ReplaySubject, scan, switchMap, tap } from 'rxjs';
 import { Chat } from 'src/app/interfaces/chat.interface';
 import { ApiService } from 'src/app/services/api.service';
 import { SpinnerService } from 'src/app/services/spinner.service';
@@ -18,7 +19,10 @@ enum EmitType {
 })
 export class ChatsPageComponent {
 
-    currentChatId$ = new ReplaySubject<number>();
+    currentChatIdSbj = new ReplaySubject<number>();
+    currentChatId$ = this.currentChatIdSbj.asObservable().pipe(
+        tap((chatId) => this.router.navigate([], { queryParams: { id: chatId } }))
+    );
     newMessage$ = this.apiService.getMessagesUpdates();
 
     chats$: Observable<Chat[]> = merge(
@@ -62,12 +66,21 @@ export class ChatsPageComponent {
         )
     );
     
-    constructor(private apiService: ApiService, private spinnerService: SpinnerService) {
+    constructor(
+        private apiService: ApiService, 
+        private spinnerService: SpinnerService,
+        private route: ActivatedRoute,
+        private router: Router
+    ) {
         this.apiService.connectToSocket();
+
+        setTimeout(() => {
+            const chatId = Number(this.route.snapshot.queryParamMap.get('id'));
+            if (chatId) this.currentChatIdSbj.next(chatId);
+        });
     }
 
     onChatClick(chatId: number): void {
-        this.currentChatId$.next(chatId);
+        this.currentChatIdSbj.next(chatId);
     }
-
 }

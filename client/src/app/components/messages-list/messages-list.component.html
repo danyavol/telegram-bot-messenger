@@ -1,18 +1,21 @@
 <div class="container">
     <div class="messages-list scroll">
-        <ul>
-            <li *ngFor="let message of messages">
-                <ng-container *ngIf="isTextMessage(message); else unsupportedMessageType">
-                    {{message.text}}
-                </ng-container>
-                
-                <ng-template #unsupportedMessageType>
-                    <span class="unsupported-msg"></span>
-                </ng-template>
-            </li>
-        </ul>
+        <ng-container *ngFor="let message of messages">
+            <div class="message not-my-message" *ngIf="isTextMessage(message); else unsupportedMessageType">
+                {{message.text}}
+            </div>
+            
+            <ng-template #unsupportedMessageType>
+                <span class="message unsupported-msg not-my-message"></span>
+            </ng-template>
+        </ng-container>
     </div>
-    <div class="send-message-form">
-        Отправить
-    </div>
+    <mat-card class="send-message-form">
+        <mat-form-field appearance="outline" class="message-input">
+            <mat-label>Сообщение пользователю</mat-label>
+            <input matInput type="password" [(ngModel)]="messageModel" (keydown.enter)="sendMessage()">
+        </mat-form-field>
+        
+        <button mat-raised-button color="primary" (click)="sendMessage()">Отправить</button>
+    </mat-card>
 </div>

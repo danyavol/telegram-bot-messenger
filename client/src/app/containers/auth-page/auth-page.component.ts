@@ -1,6 +1,8 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
+import { finalize } from 'rxjs';
 import { ApiService } from 'src/app/services/api.service';
+import { SpinnerService } from 'src/app/services/spinner.service';
 
 @Component({
     selector: 'app-auth-page',
@@ -11,10 +13,19 @@ export class AuthPageComponent {
 
     public password: string = '';
 
-    constructor(private apiService: ApiService, private router: Router) { }
+    constructor(
+        private apiService: ApiService, 
+        private router: Router, 
+        private spinnerService: SpinnerService
+    ) { }
 
     submit(): void {
-        this.apiService.getToken(this.password).subscribe(() => {
+        this.spinnerService.isActive.next(true);
+        this.apiService.getToken(this.password).pipe(
+            finalize(() => {
+                this.spinnerService.isActive.next(false);
+            })
+        ).subscribe(() => {
             this.router.navigate(['']);
         });
     }
