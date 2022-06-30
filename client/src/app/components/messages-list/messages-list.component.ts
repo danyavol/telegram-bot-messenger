@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, ElementRef, Input, ViewChild } from '@angular/core';
 import { finalize } from 'rxjs';
 import { ApiService } from 'src/app/services/api.service';
 import { SpinnerService } from 'src/app/services/spinner.service';
@@ -13,6 +13,8 @@ import { Message } from 'telegraf/typings/core/types/typegram';
 export class MessagesListComponent {
     @Input() messages: Message[] = [];
     @Input() chatId: number | null = null;
+
+    @ViewChild('inputForMsg') inputForMsgElement?: ElementRef;
 
     public messageModel: string = '';
 
@@ -29,6 +31,9 @@ export class MessagesListComponent {
         this.apiService.sendMessage(this.chatId, this.messageModel).pipe(
             finalize(() => {
                 this.spinnerService.isActive.next(false);
+                setTimeout(() => {
+                    this.inputForMsgElement?.nativeElement?.focus();
+                });
             })
         ).subscribe({
             next: (message) => {

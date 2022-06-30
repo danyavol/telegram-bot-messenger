@@ -21,7 +21,7 @@
     <mat-card class="send-message-form">
         <mat-form-field appearance="outline" class="message-input">
             <mat-label>Сообщение пользователю</mat-label>
-            <input matInput [(ngModel)]="messageModel" (keydown.enter)="sendMessage()" [disabled]="(isLoading$ | async) || false">
+            <input matInput [(ngModel)]="messageModel" (keydown.enter)="sendMessage()" [disabled]="(isLoading$ | async) || false" #inputForMsg>
         </mat-form-field>
         
         <button mat-raised-button color="primary" (click)="sendMessage()" [disabled]="(isLoading$ | async) || false">Отправить</button>
