@@ -1,11 +1,18 @@
-<ul>
-    <li *ngFor="let message of messages">
-        <ng-container *ngIf="isTextMessage(message); else unsupportedMessageType">
-            {{message.text}}
-        </ng-container>
-        
-        <ng-template #unsupportedMessageType>
-            <span class="unsupported-msg"></span>
-        </ng-template>
-    </li>
-</ul>
+<div class="container">
+    <div class="messages-list scroll">
+        <ul>
+            <li *ngFor="let message of messages">
+                <ng-container *ngIf="isTextMessage(message); else unsupportedMessageType">
+                    {{message.text}}
+                </ng-container>
+                
+                <ng-template #unsupportedMessageType>
+                    <span class="unsupported-msg"></span>
+                </ng-template>
+            </li>
+        </ul>
+    </div>
+    <div class="send-message-form">
+        Отправить
+    </div>
+</div>
