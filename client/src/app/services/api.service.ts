@@ -21,6 +21,7 @@ export class ApiService {
         const socket = io(environment.socketUrl, {
             secure: true,
             autoConnect: false,
+            rejectUnauthorized: false,
             auth: (cb) => {
                 cb({ token: localStorage.getItem(tokenField) });
             }
