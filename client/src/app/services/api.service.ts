@@ -19,6 +19,7 @@ export class ApiService {
 
     constructor(private http: HttpClient, private router: Router) {
         const socket = io(environment.socketUrl, {
+            secure: true,
             autoConnect: false,
             auth: (cb) => {
                 cb({ token: localStorage.getItem(tokenField) });
