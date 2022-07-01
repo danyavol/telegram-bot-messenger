@@ -16,7 +16,7 @@ import { Message } from 'telegraf/typings/core/types/typegram';
 const server = express();
 const httpServer = http.createServer(server);
 
-server.use( cors({ origin: ['http://localhost:4200'], credentials: true }) );
+server.use( cors({ origin: ['http://localhost:4200', 'https://tg-bot-chat.netlify.app'], credentials: true }) );
 server.use(express.text());
 server.use(express.json());
 server.use(cookieParser());
