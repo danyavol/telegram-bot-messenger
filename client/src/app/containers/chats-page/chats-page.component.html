@@ -8,7 +8,7 @@
     
     <main class="container">
         <div class="chats-list" [class.hidden]="isChatOpen">
-            <div class="comp-wrapper">
+            <div class="comp-wrapper scroll">
                 <app-chats-list
                     *ngIf="chats$ | async as chats" 
                     [chats]="chats"
